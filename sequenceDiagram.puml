@@ -37,6 +37,7 @@ database OrdersDatabase
 'creates entity participiant
 entity "Shipping service" as ExternalShippingService
 
+
 ' lifetime can be defined using activate and deactivate as below. Alternatively we can use ++ or --
 ' WebUser->Portal: Orders request
 ' activate Portal
@@ -63,6 +64,7 @@ else Authentication failed 2
 end
 autonumber 5
 Gateway -> Portal--:Response
+' sub numbering
 autonumber 5.1
 Portal -> WebUser --:Response
 ' note added to item and aligned right
