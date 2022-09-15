@@ -25,26 +25,37 @@ skinparam sequence {
     MessageAlign direction
 }
 
-
+' as acts as aliasing
 actor "User" as WebUser
 participant "Frontend" as Portal 
 participant Gateway
+' \n will add new line
 participant "Identity\n Server" as IdentityServer #yellow
 participant "Rest API" as RestApi
+' creates database participiant
 database OrdersDatabase
+'creates entity participiant
 entity "Shipping service" as ExternalShippingService
 
+' lifetime can be defined using activate and deactivate as below. Alternatively we can use ++ or --
 ' WebUser->Portal: Orders request
 ' activate Portal
 ' Portal -> WebUser:Response
 ' deactivate Portal
+
+' autonumbering of sequence you can define a number and then it starts from that number autonumber 6
 autonumber
+' ++ says lifetime activated and -- says lifetime ended
 WebUser->Portal ++: Orders request
 'activate Portal
 Portal -> Gateway ++: GET API/order
+
+' we can create group using group keyword
 group Step:Authenticate
     Gateway->IdentityServer++:Authenticate
+    ' mark line as red like below
     IdentityServer-[#red]>IdentityServer:Validate
+    ' else condition in group
 else Authentication Fialed
     IdentityServer-[#green]>Gateway--: request failed
 else Authentication failed 2
@@ -54,9 +65,11 @@ autonumber 5
 Gateway -> Portal--:Response
 autonumber 5.1
 Portal -> WebUser --:Response
+' note added to item and aligned right
 note right : Authentication has failed
 'deactivate Portal
 
+' nested group
 group call order API
     Gateway -> RestApi++: GET orders
     RestApi -[#blue]>RestApi : Do processing
@@ -65,6 +78,7 @@ group database interaction
     OrdersDatabase -> RestApi--: Orders
 end
 
+' loop created
 loop find shiping startub
     autonumber inc
     'create ExternalShippingService
