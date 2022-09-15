@@ -1,0 +1,70 @@
+@startuml SubmitjobApproach1
+
+header "Approach 1"
+footer Page %page% of %lastpage%
+title "Submit Job"
+
+!theme blueprint
+
+skinparam style strictuml 
+' black and white eyes friendly.
+'skinparam Monochrome reverse
+' make it look like handwritten
+'skinparam handwritten true
+
+
+skinparam sequence {    
+    MessageAlign direction
+    NoteBackgroundColor Yellow
+}
+
+actor "LAC User\n/ FAT1" as fat1 
+participant DCClient [
+    =DCClient
+    ----
+    "ClusterConnect"
+]
+participant networkFolder [
+    ="Network drive"
+    ----
+    "Vestas folders"
+]
+participant activeDirectory[
+    ="AD"
+    ----
+    "Azure Active diretory"
+]
+
+boundary "Cluster Interface" as cloudApi
+
+queue JobQueue
+
+==Job Submission==
+'autonumber
+fat1 -> DCClient++ : Submit job
+note left: sends list of seeds,\n Path of simulation 
+DCClient -> networkFolder++ : GET INPUTS folder
+networkFolder --> DCClient-- : sends Input as zip
+DCClient -> activeDirectory ++: Request token
+activeDirectory --> DCClient --: Response token
+
+DCClient -> cloudApi ++: Query for drive map
+note left: Server holds a list\n of network drive map which\n maps Vestas drive\n and cloud drive.
+cloudApi --> DCClient --: list of drive maps
+DCClient ->DCClient: update absolute path.
+note left: Updates absolute path in\n files with the drive map information.
+DCClient -> cloudApi ++: Request for simulation,\n Upload submitjob structure
+note left: Submit job structure contains\n 1. zip input files\n 2. Zip additional files\n 3. submit job DTO
+cloudApi->JobQueue:Queue for execution
+cloudApi --> DCClient--: Response with job id
+DCClient --> fat1--: jobId
+
+==Job status query==
+loop query every 1 minute until success or timeout.
+    ...Every 1 minute...
+    fat1 -> DCClient++ : Query job : JobId
+    DCClient->cloudApi++: Query job : JobId
+    cloudApi -->DCClient-- : Status
+    DCClient -->fat1--: Status
+end
+@enduml
