@@ -43,12 +43,12 @@ WebUser->Portal ++: Orders request
 'activate Portal
 Portal -> Gateway ++: GET API/order
 group Step:Authenticate
-Gateway->IdentityServer++:Authenticate
-IdentityServer-[#red]>IdentityServer:Validate
+    Gateway->IdentityServer++:Authenticate
+    IdentityServer-[#red]>IdentityServer:Validate
 else Authentication Fialed
-IdentityServer-[#green]>Gateway--: request failed
+    IdentityServer-[#green]>Gateway--: request failed
 else Authentication failed 2
-IdentityServer->Gateway--: request failed
+    IdentityServer->Gateway--: request failed
 end
 autonumber 5
 Gateway -> Portal--:Response
@@ -58,22 +58,19 @@ note right : Authentication has failed
 'deactivate Portal
 
 group call order API
-Gateway -> RestApi++: GET orders
-RestApi -[#blue]>RestApi : Do processing
+    Gateway -> RestApi++: GET orders
+    RestApi -[#blue]>RestApi : Do processing
 group database interaction
-RestApi -> OrdersDatabase : Query orders
-OrdersDatabase -> RestApi--: Orders
+    RestApi -> OrdersDatabase : Query orders
+    OrdersDatabase -> RestApi--: Orders
 end
 
 loop find shiping startub
-autonumber inc
-'create ExternalShippingService
-RestApi->ExternalShippingService++: Find
-ExternalShippingService -> RestApi--: return response
+    autonumber inc
+    'create ExternalShippingService
+    RestApi->ExternalShippingService++: Find
+    ExternalShippingService -> RestApi--: return response
 end
-
 end
-
-
 
 @enduml
