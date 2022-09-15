@@ -1,0 +1,70 @@
+@startuml test
+' it needs java and javapath in env variable.
+' below line will make uml look lik estrict uml
+header "lets code"
+footer Page %page% of %lastpage%
+title "Hello Uml"
+
+!theme blueprint
+
+skinparam style strictuml 
+' black and white eyes friendly.
+'skinparam Monochrome reverse
+' make it look like handwritten
+'skinparam handwritten true
+
+
+skinparam sequence {
+    ' ArrowColor DeepSkyBlue
+    ' GroupBackgroundColor DeepSkyBlue
+    ' LifeLineBorderColor DeepSkyBlue
+    ' ParticipantBackgroundColor LightBlue
+    ' DatabaseBackgroundColor LightBlue
+
+    'important ones
+    MessageAlign direction
+}
+
+class Class1
+{
+    'private
+    -int Id 
+
+    ' protected
+    #int name
+
+    'public
+    +int class
+    +Method1()
+    +Method2()
+}
+
+class Class2
+{
+    'private
+    -int Id 
+
+    +Method1()
+    +Method2()
+}
+
+class Class3
+{
+    'private
+    -int Id 
+
+    +Method1()
+    +Method2()
+}
+note left : this class is a secret class
+
+Class1 <|-- Class2
+Class1 <-- Class2
+' relation
+Class1 *--- Class3
+' composition
+Class1 o--- Class2
+
+Class1 <..left.. Class3
+
+@enduml

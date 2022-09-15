@@ -1,0 +1,79 @@
+@startuml test
+' it needs java and javapath in env variable.
+' below line will make uml look lik estrict uml
+header "lets code"
+footer Page %page% of %lastpage%
+title "Hello Uml"
+
+!theme blueprint
+
+skinparam style strictuml 
+' black and white eyes friendly.
+'skinparam Monochrome reverse
+' make it look like handwritten
+'skinparam handwritten true
+
+
+skinparam sequence {
+    ' ArrowColor DeepSkyBlue
+    ' GroupBackgroundColor DeepSkyBlue
+    ' LifeLineBorderColor DeepSkyBlue
+    ' ParticipantBackgroundColor LightBlue
+    ' DatabaseBackgroundColor LightBlue
+
+    'important ones
+    MessageAlign direction
+}
+
+
+actor "User" as WebUser
+participant "Frontend" as Portal 
+participant Gateway
+participant "Identity\n Server" as IdentityServer #yellow
+participant "Rest API" as RestApi
+database OrdersDatabase
+entity "Shipping service" as ExternalShippingService
+
+' WebUser->Portal: Orders request
+' activate Portal
+' Portal -> WebUser:Response
+' deactivate Portal
+autonumber
+WebUser->Portal ++: Orders request
+'activate Portal
+Portal -> Gateway ++: GET API/order
+group Step:Authenticate
+Gateway->IdentityServer++:Authenticate
+IdentityServer-[#red]>IdentityServer:Validate
+else Authentication Fialed
+IdentityServer-[#green]>Gateway--: request failed
+else Authentication failed 2
+IdentityServer->Gateway--: request failed
+end
+autonumber 5
+Gateway -> Portal--:Response
+autonumber 5.1
+Portal -> WebUser --:Response
+note right : Authentication has failed
+'deactivate Portal
+
+group call order API
+Gateway -> RestApi++: GET orders
+RestApi -[#blue]>RestApi : Do processing
+group database interaction
+RestApi -> OrdersDatabase : Query orders
+OrdersDatabase -> RestApi--: Orders
+end
+
+loop find shiping startub
+autonumber inc
+'create ExternalShippingService
+RestApi->ExternalShippingService++: Find
+ExternalShippingService -> RestApi--: return response
+end
+
+end
+
+
+
+@enduml
