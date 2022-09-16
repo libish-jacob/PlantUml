@@ -41,8 +41,11 @@ queue JobQueue
 
 ==Job Submission==
 'autonumber
+activate fat1
+fat1->fat1:Preprocess
 fat1 -> DCClient++ : Submit job
-note left: sends list of seeds,\n Path of simulation 
+
+note left: Sends list of seeds,\n Path of simulation 
 DCClient -> networkFolder++ : GET INPUTS folder
 networkFolder --> DCClient-- : sends Input as zip
 DCClient -> activeDirectory ++: Request token
@@ -54,7 +57,7 @@ cloudApi --> DCClient --: list of drive maps
 DCClient ->DCClient: update absolute path.
 note left: Updates absolute path in\n files with the drive map information.
 DCClient -> cloudApi ++: Request for simulation,\n Upload submitjob structure
-note left: Submit job structure contains\n 1. zip input files\n 2. Zip additional files\n 3. submit job DTO
+note left: Submit job structure contains\n 1. zip input files\n 2. zip additional files\n 3. submit job DTO
 cloudApi->JobQueue:Queue for execution
 cloudApi --> DCClient--: Response with job id
 DCClient --> fat1--: jobId
