@@ -1,0 +1,94 @@
+@startuml Azure system design
+' it needs java and javapath in env variable.
+' below line will make uml look lik estrict uml
+header "SYstem design"
+footer Page %page% of %lastpage%
+title "Hello Azure"
+
+!theme blueprint
+
+'standard library covering all cloud
+'https://plantuml.com/stdlib
+!include <azure/AzureCommon>
+!include <azure/Analytics/AzureEventHub>
+!include <azure/Analytics/AzureEventHub>
+!include <azure/Analytics/AzureEventHub>
+!include <azure/Analytics/AzureEventHub>
+!include <azure/Analytics/AzureEventHub>
+
+!include <azure/Analytics/AzureStreamAnalytics>
+!include <azure/Databases/AzureCosmosDb>
+!include <azure/Compute/AzureFunction>
+!include <azure/Storage/AzureDataLakeStorage>
+!include <azure/Identity/AzureActiveDirectoryB2C>
+!include <azure/DevOps/AzureApplicationInsights>
+!include <azure/InternetOfThings/AzureTimeSeriesInsights>
+
+!includeurl AzurePuml/Databases/AzureRedisCache.puml
+!includeurl AzurePuml/Databases/AzureCosmosDb.puml
+!includeurl AzurePuml/Databases/AzureSqlDatabase.puml
+!includeurl AzurePuml/Web/AzureWebApp.puml
+!includeurl AzurePuml/Web/AzureCDN.puml
+!includeurl AzurePuml/Web/AzureSearch.puml
+!includeurl AzurePuml/Storage/AzureBlobStorage.puml
+!includeurl AzurePuml/Storage/AzureQueueStorage.puml
+' !includeurl AzurePuml/Analytics/AzureEventHub.puml
+' !includeurl AzurePuml/Compute/AzureFunction.puml
+' !includeurl AzurePuml/Databases/AzureCosmosDb.puml
+' !includeurl AzurePuml/Storage/AzureDataLakeStorage.puml
+' !includeurl AzurePuml/Analytics/AzureStreamAnalytics.puml
+' !includeurl AzurePuml/InternetOfThings/AzureTimeSeriesInsights.puml
+' !includeurl AzurePuml/Identity/AzureActiveDirectoryB2C.puml
+' !includeurl AzurePuml/DevOps/AzureApplicationInsights.puml
+'!include <azure/ Databases/AzureCosmosDb>
+'!include <azure/Databases/>
+
+skinparam style strictuml 
+' black and white eyes friendly.
+'skinparam Monochrome reverse
+' make it look like handwritten
+'skinparam handwritten true
+
+
+skinparam sequence {
+    ' ArrowColor DeepSkyBlue
+    ' GroupBackgroundColor DeepSkyBlue
+    ' LifeLineBorderColor DeepSkyBlue
+    ' ParticipantBackgroundColor LightBlue
+    ' DatabaseBackgroundColor LightBlue
+
+    'important ones
+    MessageAlign direction
+}
+
+' AzureEventHub(fareDataEventHub, "Fare Data", "PK: Medallion HackLicense VendorId; 3 TUs")
+' AzureEventHub(tripDataEventHub, "Trip Data", "PK: Medallion HackLicense VendorId; 3 TUs")
+' AzureStreamAnalytics(streamAnalytics, "Stream Processing", "6 SUs")
+' AzureCosmosDb(outputCosmosDb, "Output Database", "1,000 RUs")
+
+
+' devices --> fareDataEventHub
+' devices --> tripDataEventHub
+' fareDataEventHub --> streamAnalytics
+' tripDataEventHub --> streamAnalytics
+' streamAnalytics --> outputCosmosDb
+
+
+LAYOUT_LEFT_RIGHT
+
+AzureEventHub(rawEventsHubAlias, "Raw Event Hub", "PK: Medallion HackLicense VendorId; 3 TUs")
+AzureDataLakeStorage(datalakeAlias, "Data Lake", "GRS")
+AzureStreamAnalytics(streamAnalyticsAlias, "Aggregate Events", "6 SUs")
+AzureFunction(stateFunctionAlias, "State Processor", "C#, Consumption Plan")
+AzureEventHub(aggregatedEventsHubAlias, "Aggregated Hub", "6 TUs")
+AzureCosmosDb(stateDBAlias, "State Database", "SQL API, 1000 RUs")
+AzureTimeSeriesInsights(timeSeriesAlias, "Time Series", "2 Data Processing Units")
+
+rawEventsHubAlias ----> datalakeAlias
+rawEventsHubAlias --> streamAnalyticsAlias
+rawEventsHubAlias ---> stateFunctionAlias
+streamAnalyticsAlias --> aggregatedEventsHubAlias
+aggregatedEventsHubAlias --> timeSeriesAlias
+stateFunctionAlias --> stateDBAlias
+
+@enduml
